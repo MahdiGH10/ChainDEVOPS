@@ -1,0 +1,18 @@
+# Dependencies - MUST NOT BE TRACKED [cite: 58]
+node_modules/
+.pnp
+.pnp.js
+
+# Production / Build outputs
+dist/
+build/
+
+# Environment Secrets - Mandatory for DevSecOps [cite: 123, 132]
+.env
+.env.local
+*.log
+
+# Editor folders
+.vscode/
+.idea/
+.DS_Store
