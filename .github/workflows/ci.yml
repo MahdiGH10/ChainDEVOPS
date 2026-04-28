@@ -106,3 +106,4 @@ jobs:
       - name: 10. Push des images sur Docker Hub
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/chaindevops-backend:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/chaindevops-frontend:latest
