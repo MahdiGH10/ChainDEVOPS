@@ -2,19 +2,15 @@ name: ChainDEVOPS CI Pipeline
 
 on:
   push:
-    branches:
-      - main
-      - dev  # Adapté à ta branche 'dev'
+    branches: [main, dev]
   pull_request:
-    branches:
-      - main
-      - dev
+    branches: [main, dev]
 
 jobs:
-  frontend:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - name: 1. Récupérer le code du dépôt
+      - name: 1. Récupérer le code
         uses: actions/checkout@v4
 
       - name: 2. Installer Node.js
@@ -22,58 +18,18 @@ jobs:
         with:
           node-version: 22
 
-      - name: 3. Mettre en cache les dépendances npm du frontend
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-frontend-${{ hashFiles('frontend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-frontend-
-
-      - name: 4. Installer les dépendances du frontend
-        run: |
-          cd frontend
-          npm ci
-
-      - name: 5. Lancer ESLint sur le frontend
-        run: |
-          cd frontend
-          npm run lint || echo "Lint warning"
-
-      - name: 6. Construire l’image Docker du frontend
+      # --- SECTION FRONTEND ---
+      - name: 3. Build Frontend Image
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chaindevops-frontend:latest -f docker/frontend.Dockerfile .
 
-  backend:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 1. Récupérer le code du dépôt
-        uses: actions/checkout@v4
-
-      - name: 2. Installer Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: 3. Mettre en cache les dépendances npm du backend
-        uses: actions/cache@v3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-backend-${{ hashFiles('backend/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-backend-
-
-      - name: 4. Installer les dépendances du backend
+      # --- SECTION BACKEND ---
+      - name: 4. Build Backend Image
         run: |
-          cd backend
-          npm ci
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chaindevops-backend:latest -f docker/backend.Dockerfile .
 
-      - name: 5. Lancer ESLint sur le backend
-        run: |
-          cd backend
-          npm run lint || echo "Lint warning"
-
-      - name: 6. Analyser la qualité avec SonarCloud
+      # --- QUALITÉ ET SÉCURITÉ ---
+      - name: 5. Analyser avec SonarCloud
         run: |
           npx sonar-scanner \
             -Dsonar.projectKey=MahdiGH10_ChainDEVOPS \
@@ -84,12 +40,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 7. Construire l'image Docker du backend
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chaindevops-backend:latest -f docker/backend.Dockerfile .
-
-      # Sécurité DevSecOps (Trivy) - Option 0 pour ne pas bloquer le push si vulnérabilités
-      - name: 8. Scan de sécurité Trivy
+      - name: 6. Scan de sécurité Trivy (Backend)
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'docker.io/${{ secrets.DOCKERHUB_USERNAME }}/chaindevops-backend:latest'
@@ -97,13 +48,14 @@ jobs:
           exit-code: '0' 
           severity: 'CRITICAL,HIGH'
 
-      - name: 9. Connexion à Docker Hub
+      # --- DEPLOIEMENT (PUSH) ---
+      - name: 7. Connexion à Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: 10. Push des images sur Docker Hub
+      - name: 8. Push des images
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/chaindevops-backend:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/chaindevops-frontend:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/chaindevops-backend:latest
