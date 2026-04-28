@@ -1,6 +1,6 @@
 # Étape 1 : Build de l'application
-FROM node:18-alpine as build
-WORKDIR /app
+FROM node:22-alpine as build
+WORKDIR /app 
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ .
