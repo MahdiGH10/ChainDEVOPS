@@ -1,5 +1,5 @@
 # Utilisation d'une image légère
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Dossier de travail
 WORKDIR /app
