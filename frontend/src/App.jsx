@@ -64,9 +64,9 @@ function App() {
 
   return (
     <main className="app">
-      <header className="app-header">
-        <h1>Base React + Node.js 🚀</h1>
-        <p>Full-stack boilerplate avec Docker</p>
+      <header className="app-header custom-header">
+        <h1>🚀 Chainedevops UI Demo</h1>
+        <p>Header updated in feature branch 1</p>
       </header>
 
       <section className="card">
@@ -110,25 +110,30 @@ function App() {
         {itemsLoading && <p className="loading">Chargement...</p>}
         {itemsError && <p className="error">❌ {itemsError}</p>}
         {items && (
-          <ul className="items-list">
-            {items.items?.map((item) => (
-              <li key={item.id} className={item.completed ? 'completed' : ''}>
-                <input
-                  type="checkbox"
-                  checked={item.completed}
-                  onChange={() => handleToggleComplete(item.id)}
-                  aria-label={item.completed ? 'Marquer comme non complété' : 'Marquer comme complété'}
-                />
-                <span>{item.title}</span>
-                <button
-                  className="btn-delete"
-                  onClick={() => handleDeleteItem(item.id)}
-                  aria-label="Supprimer"
-                  style={{ marginLeft: 8 }}
-                >🗑️</button>
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul className="items-list">
+              {items.items?.map((item) => (
+                <li key={item.id} className={item.completed ? 'completed' : ''}>
+                  <input
+                    type="checkbox"
+                    checked={item.completed}
+                    onChange={() => handleToggleComplete(item.id)}
+                    aria-label={item.completed ? 'Marquer comme non complété' : 'Marquer comme complété'}
+                  />
+                  <span>{item.title}</span>
+                  <button
+                    className="btn-delete"
+                    onClick={() => handleDeleteItem(item.id)}
+                    aria-label="Supprimer"
+                    style={{ marginLeft: 8 }}
+                  >🗑️</button>
+                </li>
+              ))}
+            </ul>
+            <button className="btn-hello" style={{marginTop: '1rem', background: '#673ab7', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.5rem 1.5rem', fontWeight: 'bold', cursor: 'pointer'}} onClick={() => window.alert('Hello from feature 2!')}>
+              Say Hello
+            </button>
+          </>
         )}
       </section>
     </main>
