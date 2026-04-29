@@ -7,6 +7,7 @@ function App() {
   const { data: items, loading: itemsLoading, error: itemsError, refetch: refetchItems } = useFetch('/api/data')
   const [newTitle, setNewTitle] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [filter, setFilter] = useState('all') // all | completed | incomplete
 
   const handleAddItem = async (e) => {
     e.preventDefault()
@@ -70,6 +71,19 @@ function App() {
       </header>
 
       <section className="card">
+        <div style={{ marginBottom: '1rem' }}>
+          <label htmlFor="filter-items" style={{ fontWeight: 'bold', marginRight: 8 }}>Filtrer:</label>
+          <select
+            id="filter-items"
+            value={filter}
+            onChange={e => setFilter(e.target.value)}
+            style={{ padding: '0.3rem 0.7rem', borderRadius: 6 }}
+          >
+            <option value="all">Tous</option>
+            <option value="completed">Complétés</option>
+            <option value="incomplete">Non complétés</option>
+          </select>
+        </div>
         <h2>État de la connexion backend</h2>
         <div className="card-actions">
           <button onClick={refetchHealth} className="btn-refresh" disabled={healthLoading}>
@@ -110,9 +124,14 @@ function App() {
         {itemsLoading && <p className="loading">Chargement...</p>}
         {itemsError && <p className="error">❌ {itemsError}</p>}
         {items && (
-          <>
-            <ul className="items-list">
-              {items.items?.map((item) => (
+          <ul className="items-list">
+            {items.items
+              ?.filter(item => {
+                if (filter === 'completed') return item.completed
+                if (filter === 'incomplete') return !item.completed
+                return true
+              })
+              .map((item) => (
                 <li key={item.id} className={item.completed ? 'completed' : ''}>
                   <input
                     type="checkbox"
@@ -129,11 +148,7 @@ function App() {
                   >🗑️</button>
                 </li>
               ))}
-            </ul>
-            <button className="btn-hello" style={{marginTop: '1rem', background: '#673ab7', color: '#fff', border: 'none', borderRadius: '6px', padding: '0.5rem 1.5rem', fontWeight: 'bold', cursor: 'pointer'}} onClick={() => window.alert('Hello from feature 2!')}>
-              Say Hello
-            </button>
-          </>
+          </ul>
         )}
       </section>
     </main>
