@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: backend-monitor
+  namespace: monitoring
+  labels:
+    release: monitoring  # IMPORTANT : Doit correspondre au label de ton installation kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: backend-service # Doit correspondre au label 'app' de ton Service Kubernetes
+  endpoints:
+  - port: http             # Le nom du port dans ton Service (ex: 5000)
+    path: /metrics         # L'URL qu'on vient de créer dans le code
+    interval: 15s
