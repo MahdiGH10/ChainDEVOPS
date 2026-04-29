@@ -20,8 +20,3 @@ spec:
         env:
         - name: NODE_ENV
           value: "production"
-        envFrom:
-        - configMapRef:
-            name: postgres-config
-        - secretRef:
-            name: postgres-secret
