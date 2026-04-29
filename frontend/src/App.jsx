@@ -64,6 +64,9 @@ function App() {
 
   return (
     <main className="app">
+      <div style={{ marginTop: '2rem', color: 'purple', fontWeight: 'bold', textAlign: 'center' }}>
+        Hello from feature branch!
+      </div>
       <header className="app-header">
         <h1>Base React + Node.js 🚀</h1>
         <p>Full-stack boilerplate avec Docker</p>
