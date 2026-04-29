@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "NODE_ENV=development nodemon index.js",
     "start": "NODE_ENV=production node index.js",
-    "test": "echo \"No tests configured yet\""
+    "test": "echo \"No tests configured yet\"",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
