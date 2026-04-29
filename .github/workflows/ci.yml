@@ -18,6 +18,24 @@ jobs:
         with:
           node-version: 22
 
+      - name: 3. Lint Frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run lint
+
+      - name: 4. Lint Backend
+        working-directory: backend
+        run: |
+          npm ci
+          npm run lint
+
+      - name: 5. Test Backend
+        working-directory: backend
+        run: |
+          npm ci
+          npm test
+
       # --- SECTION FRONTEND ---
       - name: 3. Build Frontend Image
         run: |
