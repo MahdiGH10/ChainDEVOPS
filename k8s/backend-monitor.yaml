@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: backend-monitor
+  namespace: monitoring
+  labels:
+    release: monitoring # Vérifie bien que ta stack s'appelle 'monitoring'
+spec:
+  selector:
+    matchLabels:
+      app: backend # Doit être le label présent sur ton SERVICE backend
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s
