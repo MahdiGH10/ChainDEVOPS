@@ -105,13 +105,26 @@ docker build -t chaindevops-frontend:latest -f docker/frontend.Dockerfile .
 
 ---
 
-## Problèmes & Solutions
+## Observabilité
 
-Voir le rapport technique pour le détail des problèmes rencontrés et des solutions apportées.
+Le backend expose `/metrics` (client `prom-client`) et `/api/health`. Un `ServiceMonitor` (`k8s/backend-servicemonitor.yaml`) permet à Prometheus (kube-prometheus-stack) de scraper le backend toutes les 15 s.
 
----
+## Choix techniques
 
-## Auteurs
-- MahdiGH10
+| Choix | Raison |
+| --- | --- |
+| GitOps avec ArgoCD (`automated`, `prune`, `selfHeal`) | Le dépôt Git est la source de vérité ; toute dérive manuelle du cluster est corrigée automatiquement. |
+| Manifests séparés par ressource dans `k8s/` | Revue de changements lisible, un fichier par objet Kubernetes. |
+| SonarCloud + Trivy dans la CI | Qualité du code et vulnérabilités des images vérifiées avant publication. |
+| Branches `dev` → `main` | ArgoCD suit `dev` ; `main` reste la branche stable. |
 
+## Limites connues et améliorations prévues
 
+- **Tag `latest` mutable.** Les déploiements Kubernetes référencent `:latest`, donc ArgoCD ne détecte pas de nouvelle version. Amélioration : taguer les images avec le SHA du commit et mettre à jour le manifest depuis la CI.
+- **Trivy non bloquant** (`exit-code: 0`). Passer à `1` sur `CRITICAL` une fois les vulnérabilités connues corrigées, et épingler l'action à une version plutôt que `@master`.
+- **Pas de tests automatisés** côté backend (`npm test` est un placeholder). Ajouter des tests d'API (Jest + Supertest) pour `/api/health` et `/api/data`.
+- **Push des images sur les pull requests.** Limiter le push aux événements sur `main`/`dev`.
+
+## Auteur
+
+**Mahdi Gharbi** — [GitHub](https://github.com/MahdiGH10) · [LinkedIn](https://linkedin.com/in/mahdi-gharbi-6891a5273)
